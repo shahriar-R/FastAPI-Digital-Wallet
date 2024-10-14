@@ -1,6 +1,9 @@
-from sqlalchemy import Column, Integer, Float, String, ForeignKey
+
+from sqlalchemy import Column, Integer, Float, String, ForeignKey,DateTime
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from ..database import Base
+
+from db.database import Base
 
 class Transaction(Base):
     __tablename__ = "transactions"
@@ -9,4 +12,5 @@ class Transaction(Base):
     username = Column(String, ForeignKey("users.username"))
     amount = Column(Float)
     transaction_type = Column(String)
-    timestamp = Column(func.now())
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+    user = relationship("User", back_populates="transactions")
