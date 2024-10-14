@@ -4,8 +4,11 @@ from fastapi import FastAPI
 from routers import user, wallet, transaction
 from models import wallet as wallet_model, user as user_model, transaction as transaction_model
 from db.database import engine
+from Middlewares import LoggingMiddleware
 
 app = FastAPI()
+
+app.add_middleware(LoggingMiddleware)
 
 wallet_model.Base.metadata.create_all(bind=engine)
 user_model.Base.metadata.create_all(bind=engine)
