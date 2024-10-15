@@ -68,11 +68,11 @@ The app allows users to create, read, update, and delete tasks (CRUD operations)
 
 ```
 
-**_The app will be available at http://127.0.0.1:8000._**
-
 **Run the application**
 **_Use Uvicorn to start the FastAPI app._**
 
 ```shell
    uvicorn main:app --reload
 ```
+
+**_The app will be available at http://127.0.0.1:8000._**
