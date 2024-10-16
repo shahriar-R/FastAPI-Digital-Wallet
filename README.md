@@ -28,12 +28,12 @@ The app allows users to create, read, update, and delete tasks (CRUD operations)
 
 ## Installation
 
-1. **Clone the repository**:
+**Clone the repository**:
 
-   ```bash
-   git clone https://github.com/shahriar-R/FastAPI-ToDoApp.git
-   cd FastAPI-ToDoApp
-   ```
+```bash
+git clone https://github.com/shahriar-R/FastAPI-ToDoApp.git
+cd FastAPI-ToDoApp
+```
 
 **Create virtual environment**:
 
@@ -55,11 +55,55 @@ The app allows users to create, read, update, and delete tasks (CRUD operations)
 **Configure the environment variables**:
 **_Create a .env file to configure your environment variables such as database URL, secret key for JWT tokens, etc._**
 
+**Generate an SSH Key**
+**_ If you want to use an SSH key to secure the database connection (e.g., connecting to a remote PostgreSQL or MySQL server), follow these steps using OpenSSH to generate an SSH key and add it to your environment variables. _**
+**Generate the SSH Key**
+**_To generate an SSH key using OpenSSH, run the following command in your terminal:_**
+
+```shell
+   ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+```
+
+- This will generate a private and public SSH key pair.
+- Save the private key to a secure location, and copy the public key to the database server where you wish to connect.
+- You can name the keys, for example, db_key
+  After this, you’ll have two files:
+- db_key (Private key)
+- db_key.pub (Public key)
+
+**Add the Private Key to the `.env` file**
+Now, store the contents of your private key (`db_key`) in the `.env` file. Use the `BASE64` encoding to store the key safely in a single line.
+To encode the private key using `base64`, run:
+
+```shell
+   cat db_key | base64
+```
+
+Copy the output and add it to the .env file as follows:
+
+```
+   DB_SSH_KEY="your_base64_encoded_private_key"
+```
+
 ```shell
     SECRET_KEY="your_secret_key"
     DATABASE_URL="sqlite:///./test.db"
 
 ```
+
+**Configure the environment variables**:
+Create a .env file to configure your environment variables such as database URL, secret key for JWT tokens, SSH key, etc.
+Example `.env` file:
+
+```
+SECRET_KEY="your_secret_key"
+DATABASE_URL="sqlite:///./test.db"
+DB_SSH_KEY="your_base64_encoded_private_key"
+
+```
+
+**Database Migrations**
+**_Migrations are used to manage changes to the database schema over time. This ensures that any updates or modifications to the data models are reflected in the actual database tables without manually altering the database schema._**
 
 **Run the database migrations (\***if using SQLAlchemy**\*)**
 
@@ -76,3 +120,13 @@ The app allows users to create, read, update, and delete tasks (CRUD operations)
 ```
 
 **_The app will be available at http://127.0.0.1:8000._**
+
+| Method | Endpoint         | Description              |
+| ------ | ---------------- | ------------------------ |
+| POST   | /auth/register   | Register a new user      |
+| POST   | /auth/login      | User login and JWT token |
+| GET    | /tasks           | Get all tasks            |
+| POST   | /tasks           | Create a new task        |
+| GET    | /tasks/{task_id} | Get task by ID           |
+| PUT    | /tasks/{task_id} | Update task by ID        |
+| DELETE | /tasks/{task_id} | Delete task by ID        |
