@@ -95,11 +95,21 @@ Copy the output and add it to the .env file as follows:
 Create a .env file to configure your environment variables such as database URL, secret key for JWT tokens, SSH key, etc.
 Example `.env` file:
 
-```
-SECRET_KEY="your_secret_key"
-DATABASE_URL="sqlite:///./test.db"
-DB_SSH_KEY="your_base64_encoded_private_key"
+**.env File (Sensitive Environment Variables)**
+Here is an example of how your .env file might look:
 
+```shell
+   # FastAPI-specific environment variables
+   SECRET_KEY="your_secret_key"
+   DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/${POSTGRES_DB}"
+
+   # PostgreSQL-specific environment variables
+   POSTGRES_USER=your_postgres_user
+   POSTGRES_PASSWORD=your_postgres_password
+   POSTGRES_DB=your_database_name
+
+   # Base64 encoded SSH private key (for database SSH connections, if applicable)
+   DB_SSH_KEY="your_base64_encoded_private_key"
 ```
 
 **Database Migrations**
@@ -120,13 +130,3 @@ DB_SSH_KEY="your_base64_encoded_private_key"
 ```
 
 **_The app will be available at http://127.0.0.1:8000._**
-
-| Method | Endpoint         | Description              |
-| ------ | ---------------- | ------------------------ |
-| POST   | /auth/register   | Register a new user      |
-| POST   | /auth/login      | User login and JWT token |
-| GET    | /tasks           | Get all tasks            |
-| POST   | /tasks           | Create a new task        |
-| GET    | /tasks/{task_id} | Get task by ID           |
-| PUT    | /tasks/{task_id} | Update task by ID        |
-| DELETE | /tasks/{task_id} | Delete task by ID        |

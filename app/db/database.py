@@ -4,7 +4,9 @@ from sqlalchemy.orm import sessionmaker
 import os
 
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./sql_app.db")
+DATABASE_URL = os.getenv("DATABASE_URL", 
+    f"postgresql+asyncpg://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}"
+)
 
 engine = create_engine(DATABASE_URL)
 
