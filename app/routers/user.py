@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from crud.user import get_user, create_user, verify_password
 from schemas.user import UserLogin, UserCreate
@@ -13,18 +13,21 @@ router = APIRouter(
 )
 
 @router.post("/register/")
-def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = get_user(db, username=user.username)
+async def register_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
+    db_user = await get_user(db, username=user.username)
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
-    return create_user(db, user.username, user.password, user.email)
     
+   
+    await create_user(db, user.username, user.password, user.email)
+    return {"message": "User registered successfully"}
+
 
 @router.post("/login")
-def login(user: UserLogin, db: Session = Depends(get_db)):
-    db_user = get_user(db, username=user.username)
+async def login(user: UserLogin, db: AsyncSession = Depends(get_db)):
+    db_user = await get_user(db, username=user.username)
     if not db_user or not verify_password(user.password, db_user.hashed_password):
         raise HTTPException(status_code=400, detail="Invalid credentials")
     
-    access_token = create_access_token(data={"sub": db_user.username})
+    access_token = await create_access_token(data={"sub": db_user.username})
     return {"access_token": access_token, "token_type": "bearer"}

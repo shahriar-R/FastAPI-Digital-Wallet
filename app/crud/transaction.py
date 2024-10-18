@@ -1,6 +1,7 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from models import transaction as TransactionModel
 from schemas import user as UserSchema
 
-def get_transactions(db: Session, user: UserSchema.User):
-    return db.query(TransactionModel.Transaction).filter(models.Transaction.username == user.username).all()
+async def get_transactions(db: AsyncSession, user: UserSchema.User):
+    result = await db.query(TransactionModel.Transaction).filter(models.Transaction.username == user.username).all()
+    return result
