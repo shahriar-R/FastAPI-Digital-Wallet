@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from passlib.context import CryptContext
 
-from models.user import User as modelUser
+from models import User as modelUser
 from utils.authentication import hash_password
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

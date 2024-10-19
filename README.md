@@ -6,6 +6,9 @@ The app allows users to create, read, update, and delete tasks (CRUD operations)
 
 ## Features
 
+- FastAPI for the backend
+- PostgreSQL for the database
+- Docker for containerization
 - **User Authentication**: Secure authentication for user accounts.
 - **CRUD Operations**: Users can create, read, update, and delete tasks.
 - **Task Management**: Allows users to manage their to-do lists efficiently.
@@ -112,10 +115,25 @@ Here is an example of how your .env file might look:
    DB_SSH_KEY="your_base64_encoded_private_key"
 ```
 
-**Database Migrations**
-**_Migrations are used to manage changes to the database schema over time. This ensures that any updates or modifications to the data models are reflected in the actual database tables without manually altering the database schema._**
+**Build and run the containers**
 
-**Run the database migrations (\***if using SQLAlchemy**\*)**
+```shell
+   docker-compose up --build
+```
+
+**Access the application**
+The application will be available at `http://localhost:8000`. You can also access the automatic interactive API documentation at `http://localhost:8000/docs` or `http://localhost:8000/redoc`.
+
+**Database Migrations**
+Migrations are used to manage changes to the database schema over time. This ensures that any updates or modifications to the data models are reflected in the actual database tables without manually altering the database schema.
+
+**Access the web container**
+
+```
+   docker-compose exec web bash
+```
+
+**Run Alembic migrations**
 
 ```shell
    alembic upgrade head

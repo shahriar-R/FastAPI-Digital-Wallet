@@ -3,7 +3,7 @@ from sqlalchemy import Column, Integer, Float, String, ForeignKey,DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from db.database import Base
+from . import Base
 
 class Transaction(Base):
     __tablename__ = "transactions"

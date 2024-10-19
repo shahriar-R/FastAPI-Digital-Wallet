@@ -12,4 +12,4 @@ class Settings:
     POSTGRES_HOST = os.getenv("POSTGRES_HOST")
     DATABASE_URL =f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
 
-settings = Settings()
+setting = Settings()

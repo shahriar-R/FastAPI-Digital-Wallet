@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from models import wallet as WalletModel
+from models import Wallet as WalletModel
 from schemas import user as UserSchema
 
 async def deposit(db: AsyncSession, user: UserSchema.User, amount: float):

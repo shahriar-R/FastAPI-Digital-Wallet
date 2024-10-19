@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from models import transaction as TransactionModel
+from models import Transaction as TransactionModel
 from schemas import user as UserSchema
 
 async def get_transactions(db: AsyncSession, user: UserSchema.User):
