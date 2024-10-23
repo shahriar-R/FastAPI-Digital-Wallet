@@ -1,7 +1,8 @@
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-from routers import user, wallet, transaction
+from app.routers import user, wallet, transaction
 from models import wallet as wallet_model, user as user_model, transaction as transaction_model
 from db.database import engine
 from Middlewares import LoggingMiddleware
