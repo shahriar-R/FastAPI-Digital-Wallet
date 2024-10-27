@@ -2,10 +2,12 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import user, wallet, transaction
-from models import wallet as wallet_model, user as user_model, transaction as transaction_model
-from db.database import engine
-from Middlewares import LoggingMiddleware
+from .routers.user import router as user_router
+from .routers.wallet import router as wallet_router
+from .routers.transaction import router as transaction_router
+from app.models import wallet as wallet_model, user as user_model, transaction as transaction_model
+from app.db.database import engine
+from .Middlewares import LoggingMiddleware
 
 app = FastAPI()
 
@@ -32,9 +34,9 @@ app.add_middleware(
 # async def shutdown():
 #     await database.disconnect()
 
-app.include_router(wallet.router)
-app.include_router(user.router)
-app.include_router(transaction.router)
+app.include_router(wallet_router)
+app.include_router(user_router)
+app.include_router(transaction_router)
 
 
 if __name__ == "__main__":

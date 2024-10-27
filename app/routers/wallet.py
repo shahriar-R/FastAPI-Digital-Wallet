@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from crud.wallet import deposit
-from schemas.user import User
-from deps import get_db
-from utils.authentication import get_current_user
+from app.crud.wallet import deposit
+from app.schemas.user import User
+from app.deps import get_db
+from app.utils.authentication import get_current_user
 
 router = APIRouter(
     prefix="/wallet",
