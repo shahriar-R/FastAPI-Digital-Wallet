@@ -12,6 +12,6 @@ router = APIRouter(
 )
 
 @router.get("/")
-async def get_transactions(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+async def get_transactions(db: Session = Depends(get_db), current_user: User = Depends(get_current_user())):
     result= await get_transactions(db=db, user=current_user)
     return result

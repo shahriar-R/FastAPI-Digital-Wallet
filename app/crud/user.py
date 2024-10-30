@@ -12,6 +12,11 @@ async def get_user(db: AsyncSession, username: str):
     result = await db.execute(query)
     return result.scalars().first()
 
+async def get_all_user(db: AsyncSession):
+    query = select(modelUser).all
+    result = await db.execute(query)
+    return result.scalars().first()
+
 
 async def create_user(db: AsyncSession, username: str, password: str, email:str):
     hashed_password = hash_password(password)

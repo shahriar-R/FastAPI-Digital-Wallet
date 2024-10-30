@@ -1,9 +1,11 @@
-import asyncio
+import asyncio, os
 from sqlalchemy.ext.asyncio import AsyncConnection
 from logging.config import fileConfig
+from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy import engine_from_config
 from sqlalchemy.pool import NullPool
+from sqlalchemy import pool
 
 from alembic import context
 from app.models import Base
@@ -53,31 +55,18 @@ def run_migrations_offline() -> None:
     with context.begin_transaction():
         context.run_migrations()
 
-def do_run_migrations(connection: AsyncConnection):
-    context.configure(
-        connection=connection,
-        target_metadata=target_metadata,
-        render_as_batch=True
-    )
 
-    with context.begin_transaction():
-        context.run_migrations()
+DATABASE_URL ="postgresql+asyncpg://postgres:postgres@db:5432/postgres"
+connectable = create_async_engine(DATABASE_URL, poolclass=pool.NullPool)
 
-async def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
-
-    In this scenario we need to create an Engine
-    and associate a connection with the context.
-
-    """
-    connectable = create_async_engine(
-        config.get_main_option("sqlalchemy.url"),
-        future=True
-    )
+async def run_migrations_online():
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)
-    asyncio.run(connectable.run_sync(do_run_migrations))
 
+def do_run_migrations(connection: Connection):
+    context.configure(connection=connection, target_metadata=target_metadata)
+    with context.begin_transaction():
+        context.run_migrations()
     
 
 
