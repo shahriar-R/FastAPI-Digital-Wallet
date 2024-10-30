@@ -23,7 +23,7 @@ async def create_user(db: AsyncSession, username: str, password: str, email:str)
     db_user = modelUser(username=username, email=email, hashed_password=hashed_password)
     db.add(db_user)
     await db.commit()
-    await db.refresh(db_user)
+    
     return db_user
 
 def verify_password(plain_password: str, hashed_password: str):
