@@ -102,7 +102,7 @@ Here is an example of how your .env file might look:
    DB_SSH_KEY="your_base64_encoded_private_key"
 ```
 
-***1-SSL Certificate and Key:***
+***SSL Certificate and Key:***
  - ssl_certificate /etc/ssl/your_certificate.crt;
  - ssl_certificate_key /etc/ssl/your_private.key;
 These lines specify the paths to your SSL certificate and private key. Make sure these files are correctly placed at these paths.
@@ -112,11 +112,15 @@ openssl req -new -key /etc/ssl/private/your_private.key -out /etc/ssl/csr/your_r
 openssl x509 -req -days 365 -in /etc/ssl/csr/your_request.csr -signkey /etc/ssl/private/your_private.key -out /etc/ssl/certs/your_certificate.crt
 
 ```
-copy your_private.key to nginx/ssl/private.key and your_certificate.crt to nginx/ssl/certificate.crt
+- mv `your_private.key` to nginx/ssl/private.key and 
+- mv `your_certificate.crt` to nginx/ssl/certificate.crt
+
 **Nginx Configuration with SSL for FastAPI**
+
 This configuration sets up Nginx as a reverse proxy for a FastAPI application, handling both HTTP and HTTPS traffic. It redirects all HTTP traffic to HTTPS and uses a provided SSL certificate and key to secure the communication.
 
 ***HTTP to HTTPS Redirect***
+
 The first server block listens on port 80 (HTTP) and redirects all incoming traffic to the corresponding HTTPS URL:The first server block listens on port 80 (HTTP) and redirects all incoming traffic to the corresponding HTTPS URL:
 ```
 server {
@@ -126,6 +130,7 @@ server {
 }
 ```
 ***HTTPS Server Block***
+
 The second server block listens on port 443 (HTTPS) and uses the provided SSL certificate and key to secure the communication:
 ```
 server {
@@ -147,11 +152,11 @@ server {
     }
 }
 ```
-***2-Logs:***
+***Logs:***
  - access_log /var/log/nginx/access.log;
  - error_log /var/log/nginx/error.log;
 These lines specify where the access and error logs are stored.
-***3-Location Block:***
+***Location Block:***
  - location / { ... }
 
  - This block proxies all requests to your FastAPI application running on http://app:8000. The proxy_set_header directives ensure that the correct headers are passed to the backend, maintaining the client information and protocol.
