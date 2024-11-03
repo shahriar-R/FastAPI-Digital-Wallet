@@ -9,6 +9,7 @@ The app allows users to create, read, update, and delete tasks (CRUD operations)
 - FastAPI for the backend
 - PostgreSQL for the database
 - Docker for containerization
+- Nginx for reverse proxy and `ssl` certificate
 - **User Authentication**: Secure authentication for user accounts.
 - **CRUD Operations**: Users can create, read, update, and delete tasks.
 - **Task Management**: Allows users to manage their to-do lists efficiently.
@@ -18,7 +19,7 @@ The app allows users to create, read, update, and delete tasks (CRUD operations)
 ## Tech Stack
 
 - **Backend**: [FastAPI](https://fastapi.tiangolo.com/)
-- **Database**: SQLite (or replaceable with PostgreSQL, MySQL, etc.)
+- **Database**: PostgreSQL (or replaceable with  MySQL, etc.)
 - **Authentication**: JWT (JSON Web Tokens)
 - **Dependencies Management**: `pip` and `virtualenv`
 
@@ -38,21 +39,12 @@ git clone https://github.com/shahriar-R/FastAPI-ToDoApp.git
 cd FastAPI-ToDoApp
 ```
 
-**Create virtual environment**:
-
+**Run Alembic migrations**
+**Database Migrations**
+Migrations are used to manage changes to the database schema over time. This ensures that any updates or modifications to the data models are reflected in the actual database tables without manually altering the database schema.
 ```shell
-   python3 -m venv venv
+   alembic upgrade head
 
-```
-
-```shell
- source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-```
-
-**Install dependencies**:
-
-```shell
-  pip install -r requirements.txt
 ```
 
 **Configure the environment variables**:
@@ -88,11 +80,6 @@ Copy the output and add it to the .env file as follows:
    DB_SSH_KEY="your_base64_encoded_private_key"
 ```
 
-```shell
-    SECRET_KEY="your_secret_key"
-    DATABASE_URL="sqlite:///./test.db"
-
-```
 
 **Configure the environment variables**:
 Create a .env file to configure your environment variables such as database URL, secret key for JWT tokens, SSH key, etc.
@@ -115,6 +102,74 @@ Here is an example of how your .env file might look:
    DB_SSH_KEY="your_base64_encoded_private_key"
 ```
 
+***1-SSL Certificate and Key:***
+ - ssl_certificate /etc/ssl/your_certificate.crt;
+ - ssl_certificate_key /etc/ssl/your_private.key;
+These lines specify the paths to your SSL certificate and private key. Make sure these files are correctly placed at these paths.
+```
+openssl genpkey -algorithm RSA -out /etc/ssl/private/your_private.key
+openssl req -new -key /etc/ssl/private/your_private.key -out /etc/ssl/csr/your_request.csr
+openssl x509 -req -days 365 -in /etc/ssl/csr/your_request.csr -signkey /etc/ssl/private/your_private.key -out /etc/ssl/certs/your_certificate.crt
+
+```
+copy your_private.key to nginx/ssl/private.key and your_certificate.crt to nginx/ssl/certificate.crt
+**Nginx Configuration with SSL for FastAPI**
+This configuration sets up Nginx as a reverse proxy for a FastAPI application, handling both HTTP and HTTPS traffic. It redirects all HTTP traffic to HTTPS and uses a provided SSL certificate and key to secure the communication.
+
+***HTTP to HTTPS Redirect***
+The first server block listens on port 80 (HTTP) and redirects all incoming traffic to the corresponding HTTPS URL:The first server block listens on port 80 (HTTP) and redirects all incoming traffic to the corresponding HTTPS URL:
+```
+server {
+    listen 80;
+    server_name localhost;
+    return 301 https://$host$request_uri;
+}
+```
+***HTTPS Server Block***
+The second server block listens on port 443 (HTTPS) and uses the provided SSL certificate and key to secure the communication:
+```
+server {
+    listen 443 ssl;
+    server_name localhost;
+
+    ssl_certificate /etc/ssl/your_certificate.crt;
+    ssl_certificate_key /etc/ssl/your_private.key;
+
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+
+    location / {
+        proxy_pass http://app:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+***2-Logs:***
+ - access_log /var/log/nginx/access.log;
+ - error_log /var/log/nginx/error.log;
+These lines specify where the access and error logs are stored.
+***3-Location Block:***
+ - location / { ... }
+
+ - This block proxies all requests to your FastAPI application running on http://app:8000. The proxy_set_header directives ensure that the correct headers are passed to the backend, maintaining the client information and protocol.
+
+ **How to Apply This Configuration**
+  - Place your SSL certificate and key in the specified paths (e.g., /etc/ssl/your_certificate.crt and /etc/ssl/your_private.key).
+
+ - Copy the Nginx configuration to the appropriate directory (e.g., /etc/nginx/sites-available/your_config).
+
+- Create a symbolic link to the sites-enabled directory:
+```
+  sudo ln -s /etc/nginx/sites-available/your_config /etc/nginx/sites-enabled/
+```
+ - Test the Nginx configuration to ensure there are no syntax errors:
+ ```
+ sudo nginx -t
+```
+
 **Build and run the containers**
 
 ```shell
@@ -124,27 +179,4 @@ Here is an example of how your .env file might look:
 **Access the application**
 The application will be available at `http://localhost:8000`. You can also access the automatic interactive API documentation at `http://localhost:8000/docs` or `http://localhost:8000/redoc`.
 
-**Database Migrations**
-Migrations are used to manage changes to the database schema over time. This ensures that any updates or modifications to the data models are reflected in the actual database tables without manually altering the database schema.
 
-**Access the web container**
-
-```
-   docker-compose exec web bash
-```
-
-**Run Alembic migrations**
-
-```shell
-   alembic upgrade head
-
-```
-
-**Run the application**
-**_Use Uvicorn to start the FastAPI app._**
-
-```shell
-   uvicorn main:app --reload
-```
-
-**_The app will be available at http://127.0.0.1:8000._**
