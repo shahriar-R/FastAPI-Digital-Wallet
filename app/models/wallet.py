@@ -1,6 +1,6 @@
 from sqlalchemy import Integer, Float, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from . import Base
+from . import Base, User
 
 
 class Wallet(Base):
@@ -10,4 +10,4 @@ class Wallet(Base):
     balance: Mapped[float] = mapped_column(Float, default=0.0)
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
-    owner: Mapped["User"] = relationship("User", back_populates="wallets")
+    owner: Mapped["User"] = relationship(back_populates="wallets")

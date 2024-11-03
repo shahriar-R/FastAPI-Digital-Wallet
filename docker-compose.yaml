@@ -13,20 +13,36 @@ services:
       - db
     volumes:
       - .:/code # Mount the source code to the container
-    command:
-      [
-        "sh",
-        "-c",
-        "./wait-for-it.sh db:5432 && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000",
-      ]
+      - ./nginx/ssl:/etc/ssl
+    networks:
+      - app-network
+    command: [ "sh", "-c", "./wait-for-it.sh db:5432 && alembic upgrade head && uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--ssl-keyfile", "/etc/ssl/your_private.key", "--ssl-certfile", "/etc/ssl/your_certificate.crt " ]
 
   db:
     image: postgres:13
     env_file:
       - .env
-
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/ssl
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - app
+    networks:
+      - app-network
+
+networks:
+  app-network:
+
 
 volumes:
   postgres_data:
